@@ -1,0 +1,22 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "IoTHubMessages",
+      "direction": "in",
+      "eventHubName": "samples-workitems",
+      "connection": "environmentStorage",
+      "cardinality": "many",
+      "consumerGroup": "$Default"
+    },
+    {
+      "name": "cosmosDBOutput",
+      "type": "cosmosDB",
+      "databaseName": "environmentData",
+      "collectionName": "MyCollection",
+      "createIfNotExists": true,
+      "connectionStringSetting": "COSMOSDB",
+      "direction": "out"
+    }
+  ]
+}
