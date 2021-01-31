@@ -9,8 +9,8 @@ module.exports = function (context, IoTHubMessages) {
     IoTHubMessages.forEach(message => {
         context.log(`Processed message: ${message}`);
         count++;
-        temperature += message.temperature;
-        humidity += message.humidity;
+        temperature = message.temperature;
+        humidity = message.humidity;
         deviceId = message.deviceId;
     });
 
@@ -23,7 +23,7 @@ module.exports = function (context, IoTHubMessages) {
 
     context.log(`output content: ${output}`);
 
-    context.cosmosDBOutput.outputDocument = output;
+    context.bindings.cosmosDBOutput = output;
 
     context.done();
 };

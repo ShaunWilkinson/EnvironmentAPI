@@ -4,7 +4,7 @@
       "type": "eventHubTrigger",
       "name": "IoTHubMessages",
       "direction": "in",
-      "eventHubName": "samples-workitems",
+      "eventHubName": "serverenvironment",
       "connection": "environmentStorage",
       "cardinality": "many",
       "consumerGroup": "$Default"
@@ -12,7 +12,7 @@
     {
       "name": "cosmosDBOutput",
       "type": "cosmosDB",
-      "databaseName": "environmentData",
+      "databaseName": "environmental-data",
       "collectionName": "MyCollection",
       "createIfNotExists": true,
       "connectionStringSetting": "COSMOSDB",
