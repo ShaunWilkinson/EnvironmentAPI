@@ -9,13 +9,8 @@ const client = new CosmosClient({endpoint, key});
 const database = client.database(databaseId);
 const container = database.container(containerId);
 
-/**
- * HTTP function that returns all data from a specified date
- * @param {*} context SYSTEM PROVIDED
- * @param {*} req Users request - Must contain 'DateFrom' value in body of request
- */
 module.exports = async function (context, req) {
-    context.log('Retrieving data from given date.');
+    context.log('Retrieving average humidity');
 
     // Retrieve the date from filter, if not present then set to null
     const dateRegex = new RegExp(/^\d\d\d\d-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|3[0-1])$/);
@@ -29,37 +24,48 @@ module.exports = async function (context, req) {
     if(providedStartDate) {
         if(providedEndDate) {
             query = {
-                query: `SELECT *
+                query: `SELECT c.humidity, udf.convertTime(c._ts) as submittedTime
                         FROM c
                         WHERE udf.convertTime(c._ts) >= '${dateFromFilter}' AND udf.convertTime(c._ts) <= '${dateToFilter}'`
             }
         } else {
             query = {
-                query: `SELECT *
+                query: `SELECT c.humidity, udf.convertTime(c._ts) as submittedTime
                         FROM c
                         WHERE udf.convertTime(c._ts) >= '${dateFromFilter}'`
             }
         }
     } else {
         query = {
-            query: `SELECT *
+            query: `SELECT c.humidity, udf.convertTime(c._ts) as submittedTime
                     FROM c`
         }
     }
+
+    let average = 0;
     try {
         // Await returning all records
         const { resources: items } = await container.items
             .query(query)
             .fetchAll();
 
-        context.res = {
-            status: 200, /* Defaults to 200 */
-            body: items
-        };
+            // Calculate the average value
+        let total = 0;
+        items.forEach(item => {
+            total += item.temperature
+        });
+        average = total / items.length
+
     } catch (error) {
         context.res = {
             status: 400,
             body: "Failed to retrieve records - " + error
         }
+        context.done();
     }
+        
+    context.res = {
+        status: 200, /* Defaults to 200 */
+        body: average
+    };
 }
